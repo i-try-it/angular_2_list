@@ -20,7 +20,7 @@ var XyzUserListComponent = (function () {
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
-        var storageValue = window.sessionStorage.getItem(this.storageKey);
+        var storageValue = window.localStorage.getItem(this.storageKey);
         this.filter = storageValue ? JSON.parse(storageValue) : '';
         this.xyzUserListService.get().then(function (users) {
             if (_this.filter && _this.filter.length) {
@@ -36,14 +36,14 @@ var XyzUserListComponent = (function () {
         var _this = this;
         this.filter = filter;
         var storageValue = JSON.stringify(filter);
-        window.sessionStorage.setItem(this.storageKey, storageValue);
+        window.localStorage.setItem(this.storageKey, storageValue);
         this.xyzUserListService.get().then(function (users) {
             _this.users = _this.xyzFilterByService.get({ data: users, filter: filter });
         });
     };
     XyzUserListComponent.prototype.onClear = function () {
         var _this = this;
-        window.sessionStorage.removeItem(this.storageKey);
+        window.localStorage.removeItem(this.storageKey);
         this.xyzUserListService.get().then(function (users) { return _this.users = users; });
         this.filter = '';
     };

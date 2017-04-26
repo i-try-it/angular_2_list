@@ -22,7 +22,7 @@ export class XyzUserListComponent implements OnInit {
   }
 
   ngOnInit() { // will fire once on page load
-    let storageValue = window.sessionStorage.getItem(this.storageKey);
+    let storageValue = window.localStorage.getItem(this.storageKey);
     this.filter = storageValue ? JSON.parse(storageValue) : '';
     this.xyzUserListService.get().then(users => {
       if(this.filter && this.filter.length) {
@@ -37,14 +37,14 @@ export class XyzUserListComponent implements OnInit {
   onFilter(filter) {
     this.filter = filter;
     let storageValue = JSON.stringify(filter);
-    window.sessionStorage.setItem(this.storageKey, storageValue);
+    window.localStorage.setItem(this.storageKey, storageValue);
     this.xyzUserListService.get().then(users => {
       this.users = this.xyzFilterByService.get({ data: users, filter: filter });
     })
   }
 
   onClear() {
-    window.sessionStorage.removeItem(this.storageKey);
+    window.localStorage.removeItem(this.storageKey);
     this.xyzUserListService.get().then(users => this.users = users);
     this.filter = '';
   }
