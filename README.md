@@ -24,3 +24,6 @@ create record with 2 fields: 'id' = 'settings' and 'filter'=''
 2.  restart database
     to stop => run cmd as Administrator and then: net.exe stop "apache couchdb"
     to start use Start CouchDB bat files
+
+#take a look at observables
+http://reactivex.io/

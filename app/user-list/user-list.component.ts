@@ -6,6 +6,9 @@ import { Http } from '@angular/http';
 import { XyzFilterByService } from '../shared/filter-by.service';
 import { XyzUserListService } from './user-list.service';
 
+import { Subject } from 'rxjs/Subject'
+import 'rxjs/add/operator/debounceTime';
+
 @Component({
   selector: 'xyz-user-list',
   providers: [ XyzFilterByService, XyzUserListService ],
@@ -18,6 +21,7 @@ export class XyzUserListComponent implements OnInit {
   path: string;
   revision: string;
   settingsUrl: string;
+  subject: Subject<string>;
 
   constructor(
     private http: Http,
@@ -26,6 +30,7 @@ export class XyzUserListComponent implements OnInit {
   ) {
     this.storageKey = 'filter';
     this.settingsUrl = 'http://localhost:5984/user/settings';
+    this.subject = new Subject();
   }
 
   ngOnInit() { // will fire once on page load
@@ -33,6 +38,12 @@ export class XyzUserListComponent implements OnInit {
       let settings = response.json();
       this.revision = settings._rev;
       this.filter = (settings.filter && settings.filter.length) ? settings.filter : '';
+      //new requests are only sends when typing stops
+      //only last parameters will be used
+      this.subject.debounceTime(500).subscribe(response => {
+        this.onFilter(response);
+      });
+
       this.xyzUserListService.get().then(users => {
         if(this.filter && this.filter.length) {
           this.users = this.xyzFilterByService.get({ data: users, filter: this.filter})
