@@ -28,6 +28,10 @@ var XyzUserListComponent = (function () {
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this.http.get('http://localhost:5984/user/locations').subscribe(function (response) {
+            var locations = response.json();
+            _this.regions = (locations.regions && locations.regions.length) ? locations.regions : [];
+        });
         this.jsonp.get(this.settingsUrl + "?callback=JSONP_CALLBACK").subscribe(function (response) {
             var settings = response.json();
             _this.revision = settings._rev;

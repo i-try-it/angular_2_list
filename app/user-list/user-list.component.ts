@@ -23,6 +23,7 @@ export class XyzUserListComponent implements OnInit {
   revision: string;
   settingsUrl: string;
   subject: Subject<string>;
+  regions: string[];
 
   constructor(
     private http: Http,
@@ -36,6 +37,10 @@ export class XyzUserListComponent implements OnInit {
   }
 
   ngOnInit() { // will fire once on page load
+    this.http.get('http://localhost:5984/user/locations').subscribe(response => {
+      let locations = response.json();
+      this.regions = (locations.regions && locations.regions.length) ? locations.regions : [];
+    })
     this.jsonp.get(`${this.settingsUrl}?callback=JSONP_CALLBACK`).subscribe( response => {
       let settings = response.json();
       this.revision = settings._rev;

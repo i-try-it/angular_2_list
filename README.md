@@ -34,3 +34,9 @@ http://reactivex.io/
  in CouchDB:
     [httpd]
     allow_jsonp = true
+
+create new document
+{
+   "_id": "locations",
+   "regions": ["Turkey", "Greece", "Slovakia", "Japan", "Slovakia", "Netherlands", "Greece", "Romania", "Germany", "Italy", "Canada", "United States", "Mexico", "Turkey", "Greece", "Mexico"]
+}
