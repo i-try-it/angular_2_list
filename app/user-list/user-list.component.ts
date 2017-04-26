@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+
 
 import { XyzFilterByService } from '../shared/filter-by.service';
 import { XyzUserListService } from './user-list.service';
@@ -13,17 +15,22 @@ export class XyzUserListComponent implements OnInit {
   filter: string;
   users: User[];
   storageKey: string;
+  path: string;
 
   constructor(
+    private router: Router,
+    private activatedRote: ActivatedRoute,
     private xyzUserListService: XyzUserListService,
     private xyzFilterByService: XyzFilterByService
   ) {
     this.storageKey = 'filter';
+    this.activatedRote.url.subscribe(url => this.path = url[0].path)
   }
 
   ngOnInit() { // will fire once on page load
-    let storageValue = window.localStorage.getItem(this.storageKey);
-    this.filter = storageValue ? JSON.parse(storageValue) : '';
+    this.activatedRote.params.subscribe(params => {
+      this.filter = (params[this.storageKey]) ? params[this.storageKey] : '';
+    });
     this.xyzUserListService.get().then(users => {
       if(this.filter && this.filter.length) {
         this.users = this.xyzFilterByService.get({ data: users, filter: this.filter})
@@ -36,15 +43,16 @@ export class XyzUserListComponent implements OnInit {
 
   onFilter(filter) {
     this.filter = filter;
-    let storageValue = JSON.stringify(filter);
-    window.localStorage.setItem(this.storageKey, storageValue);
+    let filterParams = {};
+    filterParams[this.storageKey] = this.filter;
+    this.router.navigate([ this.path, filterParams ])
     this.xyzUserListService.get().then(users => {
       this.users = this.xyzFilterByService.get({ data: users, filter: filter });
     })
   }
 
   onClear() {
-    window.localStorage.removeItem(this.storageKey);
+    this.router.navigate([ this.path ])
     this.xyzUserListService.get().then(users => this.users = users);
     this.filter = '';
   }

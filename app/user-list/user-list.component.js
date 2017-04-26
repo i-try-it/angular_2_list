@@ -10,18 +10,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
+var router_1 = require("@angular/router");
 var filter_by_service_1 = require("../shared/filter-by.service");
 var user_list_service_1 = require("./user-list.service");
 var XyzUserListComponent = (function () {
-    function XyzUserListComponent(xyzUserListService, xyzFilterByService) {
+    function XyzUserListComponent(router, activatedRote, xyzUserListService, xyzFilterByService) {
+        var _this = this;
+        this.router = router;
+        this.activatedRote = activatedRote;
         this.xyzUserListService = xyzUserListService;
         this.xyzFilterByService = xyzFilterByService;
         this.storageKey = 'filter';
+        this.activatedRote.url.subscribe(function (url) { return _this.path = url[0].path; });
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
-        var storageValue = window.localStorage.getItem(this.storageKey);
-        this.filter = storageValue ? JSON.parse(storageValue) : '';
+        this.activatedRote.params.subscribe(function (params) {
+            _this.filter = (params[_this.storageKey]) ? params[_this.storageKey] : '';
+        });
         this.xyzUserListService.get().then(function (users) {
             if (_this.filter && _this.filter.length) {
                 _this.users = _this.xyzFilterByService.get({ data: users, filter: _this.filter });
@@ -35,15 +41,16 @@ var XyzUserListComponent = (function () {
     XyzUserListComponent.prototype.onFilter = function (filter) {
         var _this = this;
         this.filter = filter;
-        var storageValue = JSON.stringify(filter);
-        window.localStorage.setItem(this.storageKey, storageValue);
+        var filterParams = {};
+        filterParams[this.storageKey] = this.filter;
+        this.router.navigate([this.path, filterParams]);
         this.xyzUserListService.get().then(function (users) {
             _this.users = _this.xyzFilterByService.get({ data: users, filter: filter });
         });
     };
     XyzUserListComponent.prototype.onClear = function () {
         var _this = this;
-        window.localStorage.removeItem(this.storageKey);
+        this.router.navigate([this.path]);
         this.xyzUserListService.get().then(function (users) { return _this.users = users; });
         this.filter = '';
     };
@@ -55,7 +62,9 @@ XyzUserListComponent = __decorate([
         providers: [filter_by_service_1.XyzFilterByService, user_list_service_1.XyzUserListService],
         templateUrl: 'app/user-list/user-list.component.html'
     }),
-    __metadata("design:paramtypes", [user_list_service_1.XyzUserListService,
+    __metadata("design:paramtypes", [router_1.Router,
+        router_1.ActivatedRoute,
+        user_list_service_1.XyzUserListService,
         filter_by_service_1.XyzFilterByService])
 ], XyzUserListComponent);
 exports.XyzUserListComponent = XyzUserListComponent;
