@@ -8,6 +8,7 @@ import { XyzUserListService } from './user-list.service';
 
 import { Subject } from 'rxjs/Subject'
 import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
 
 @Component({
   selector: 'xyz-user-list',
@@ -40,7 +41,10 @@ export class XyzUserListComponent implements OnInit {
       this.filter = (settings.filter && settings.filter.length) ? settings.filter : '';
       //new requests are only sends when typing stops
       //only last parameters will be used
-      this.subject.debounceTime(500).subscribe(response => {
+      this.subject
+        .debounceTime(500)
+        .distinctUntilChanged()
+        .subscribe(response => {
         this.onFilter(response);
       });
 

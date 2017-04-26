@@ -15,6 +15,7 @@ var filter_by_service_1 = require("../shared/filter-by.service");
 var user_list_service_1 = require("./user-list.service");
 var Subject_1 = require("rxjs/Subject");
 require("rxjs/add/operator/debounceTime");
+require("rxjs/add/operator/distinctUntilChanged");
 var XyzUserListComponent = (function () {
     function XyzUserListComponent(http, xyzUserListService, xyzFilterByService) {
         this.http = http;
@@ -32,7 +33,10 @@ var XyzUserListComponent = (function () {
             _this.filter = (settings.filter && settings.filter.length) ? settings.filter : '';
             //new requests are only sends when typing stops
             //only last parameters will be used
-            _this.subject.debounceTime(500).subscribe(function (response) {
+            _this.subject
+                .debounceTime(500)
+                .distinctUntilChanged()
+                .subscribe(function (response) {
                 _this.onFilter(response);
             });
             _this.xyzUserListService.get().then(function (users) {
