@@ -28,8 +28,8 @@ export class XyzUserListComponent implements OnInit {
   }
 
   ngOnInit() { // will fire once on page load
-    this.activatedRote.queryParams.subscribe(params => {
-      this.filter = (params[this.storageKey]) ? params[this.storageKey] : '';
+    this.activatedRote.fragment.subscribe(fragment => {
+      this.filter = (fragment) ? fragment : '';
     });
     this.xyzUserListService.get().then(users => {
       if(this.filter && this.filter.length) {
@@ -45,14 +45,14 @@ export class XyzUserListComponent implements OnInit {
     this.filter = filter;
     let filterParams = {};
     filterParams[this.storageKey] = this.filter;
-    this.router.navigate([ this.path ] , { queryParams: filterParams }) // This second argument is called navigation extras, and allows for optional settings used during navigation
+    this.router.navigate([ this.path ] , { fragment: this.filter }) // This second argument is called navigation extras, and allows for optional settings used during navigation
     this.xyzUserListService.get().then(users => {
       this.users = this.xyzFilterByService.get({ data: users, filter: filter });
     })
   }
 
   onClear() {
-    this.router.navigate([ this.path ], { queryParams: [] })
+    this.router.navigate([ this.path ], { fragment: '' })
     this.xyzUserListService.get().then(users => this.users = users);
     this.filter = '';
   }

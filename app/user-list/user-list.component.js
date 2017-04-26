@@ -25,8 +25,8 @@ var XyzUserListComponent = (function () {
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.activatedRote.queryParams.subscribe(function (params) {
-            _this.filter = (params[_this.storageKey]) ? params[_this.storageKey] : '';
+        this.activatedRote.fragment.subscribe(function (fragment) {
+            _this.filter = (fragment) ? fragment : '';
         });
         this.xyzUserListService.get().then(function (users) {
             if (_this.filter && _this.filter.length) {
@@ -43,14 +43,14 @@ var XyzUserListComponent = (function () {
         this.filter = filter;
         var filterParams = {};
         filterParams[this.storageKey] = this.filter;
-        this.router.navigate([this.path], { queryParams: filterParams }); // This second argument is called navigation extras, and allows for optional settings used during navigation
+        this.router.navigate([this.path], { fragment: this.filter }); // This second argument is called navigation extras, and allows for optional settings used during navigation
         this.xyzUserListService.get().then(function (users) {
             _this.users = _this.xyzFilterByService.get({ data: users, filter: filter });
         });
     };
     XyzUserListComponent.prototype.onClear = function () {
         var _this = this;
-        this.router.navigate([this.path], { queryParams: [] });
+        this.router.navigate([this.path], { fragment: '' });
         this.xyzUserListService.get().then(function (users) { return _this.users = users; });
         this.filter = '';
     };
