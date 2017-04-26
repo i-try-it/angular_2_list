@@ -27,3 +27,10 @@ create record with 2 fields: 'id' = 'settings' and 'filter'=''
 
 #take a look at observables
 http://reactivex.io/
+
+
+#JSONP
+ JSONP returns the object inside a function with a known variable name.
+ in CouchDB:
+    [httpd]
+    allow_jsonp = true

@@ -17,8 +17,9 @@ var Subject_1 = require("rxjs/Subject");
 require("rxjs/add/operator/debounceTime");
 require("rxjs/add/operator/distinctUntilChanged");
 var XyzUserListComponent = (function () {
-    function XyzUserListComponent(http, xyzUserListService, xyzFilterByService) {
+    function XyzUserListComponent(http, jsonp, xyzUserListService, xyzFilterByService) {
         this.http = http;
+        this.jsonp = jsonp;
         this.xyzUserListService = xyzUserListService;
         this.xyzFilterByService = xyzFilterByService;
         this.storageKey = 'filter';
@@ -27,7 +28,7 @@ var XyzUserListComponent = (function () {
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.http.get(this.settingsUrl).subscribe(function (response) {
+        this.jsonp.get(this.settingsUrl + "?callback=JSONP_CALLBACK").subscribe(function (response) {
             var settings = response.json();
             _this.revision = settings._rev;
             _this.filter = (settings.filter && settings.filter.length) ? settings.filter : '';
@@ -87,6 +88,7 @@ XyzUserListComponent = __decorate([
         templateUrl: 'app/user-list/user-list.component.html'
     }),
     __metadata("design:paramtypes", [http_1.Http,
+        http_1.Jsonp,
         user_list_service_1.XyzUserListService,
         filter_by_service_1.XyzFilterByService])
 ], XyzUserListComponent);

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { OnInit } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Jsonp } from '@angular/http';
 
 
 import { XyzFilterByService } from '../shared/filter-by.service';
@@ -26,6 +26,7 @@ export class XyzUserListComponent implements OnInit {
 
   constructor(
     private http: Http,
+    private jsonp: Jsonp,
     private xyzUserListService: XyzUserListService,
     private xyzFilterByService: XyzFilterByService
   ) {
@@ -35,7 +36,7 @@ export class XyzUserListComponent implements OnInit {
   }
 
   ngOnInit() { // will fire once on page load
-    this.http.get(this.settingsUrl).subscribe( response => {
+    this.jsonp.get(`${this.settingsUrl}?callback=JSONP_CALLBACK`).subscribe( response => {
       let settings = response.json();
       this.revision = settings._rev;
       this.filter = (settings.filter && settings.filter.length) ? settings.filter : '';
