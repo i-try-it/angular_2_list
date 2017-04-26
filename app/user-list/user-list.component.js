@@ -16,20 +16,34 @@ var XyzUserListComponent = (function () {
     function XyzUserListComponent(xyzUserListService, xyzFilterByService) {
         this.xyzUserListService = xyzUserListService;
         this.xyzFilterByService = xyzFilterByService;
+        this.storageKey = 'filter';
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.xyzUserListService.get().then(function (users) { return _this.users = users; });
+        var storageValue = window.sessionStorage.getItem(this.storageKey);
+        this.filter = storageValue ? JSON.parse(storageValue) : '';
+        this.xyzUserListService.get().then(function (users) {
+            if (_this.filter && _this.filter.length) {
+                _this.users = _this.xyzFilterByService.get({ data: users, filter: _this.filter });
+            }
+            else {
+                _this.users = users;
+            }
+            return _this.users;
+        });
     };
     XyzUserListComponent.prototype.onFilter = function (filter) {
         var _this = this;
         this.filter = filter;
+        var storageValue = JSON.stringify(filter);
+        window.sessionStorage.setItem(this.storageKey, storageValue);
         this.xyzUserListService.get().then(function (users) {
             _this.users = _this.xyzFilterByService.get({ data: users, filter: filter });
         });
     };
     XyzUserListComponent.prototype.onClear = function () {
         var _this = this;
+        window.sessionStorage.removeItem(this.storageKey);
         this.xyzUserListService.get().then(function (users) { return _this.users = users; });
         this.filter = '';
     };
