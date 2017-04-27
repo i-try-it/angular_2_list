@@ -5,6 +5,7 @@ import { XyzFilterByService } from '../shared/filter-by.service';
 import { XyzRestRequestService } from '../shared/rest-request.service';
 import { XyzUrlService } from '../shared/url.service'
 import { XyzUserListService } from './user-list.service';
+import { XyzBrowserStorageService } from '../shared/browser-storage.service';
 
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
@@ -14,7 +15,7 @@ import 'rxjs/add/observable/forkJoin';
 
 @Component({
   selector: 'xyz-user-list',
-  providers: [XyzFilterByService, XyzUserListService, XyzRestRequestService, XyzUrlService],
+  providers: [XyzFilterByService, XyzUserListService, XyzRestRequestService, XyzUrlService, XyzBrowserStorageService],
   templateUrl: 'app/user-list/user-list.component.html'
 })
 export class XyzUserListComponent implements OnInit {
@@ -31,13 +32,15 @@ export class XyzUserListComponent implements OnInit {
     private xyzUserListService: XyzUserListService,
     private xyzFilterByService: XyzFilterByService,
     private xyzRestRequestService: XyzRestRequestService,
-    private xyzUrlService: XyzUrlService
+    private xyzUrlService: XyzUrlService,
+    private xyzBrowserStorageService: XyzBrowserStorageService
   ) {
     this.storageKey = 'filter';
     this.subject = new Subject();
   }
 
   ngOnInit() { // will fire once on page load
+    this.xyzBrowserStorageService.setSession('foo', 'bar');
     this.xyzUrlService.set('fragment', 'foobarbaz').then(response => console.log('set ', response))
     this.xyzUrlService.get('fragment').subscribe(response => {
       console.log('get ', response)
@@ -63,7 +66,6 @@ export class XyzUserListComponent implements OnInit {
         }
         return this.users;
       });
-
     })
 
     this.subject

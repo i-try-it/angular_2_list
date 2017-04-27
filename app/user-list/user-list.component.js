@@ -14,22 +14,25 @@ var filter_by_service_1 = require("../shared/filter-by.service");
 var rest_request_service_1 = require("../shared/rest-request.service");
 var url_service_1 = require("../shared/url.service");
 var user_list_service_1 = require("./user-list.service");
+var browser_storage_service_1 = require("../shared/browser-storage.service");
 var Subject_1 = require("rxjs/Subject");
 var Observable_1 = require("rxjs/Observable");
 require("rxjs/add/operator/debounceTime");
 require("rxjs/add/operator/distinctUntilChanged");
 require("rxjs/add/observable/forkJoin");
 var XyzUserListComponent = (function () {
-    function XyzUserListComponent(xyzUserListService, xyzFilterByService, xyzRestRequestService, xyzUrlService) {
+    function XyzUserListComponent(xyzUserListService, xyzFilterByService, xyzRestRequestService, xyzUrlService, xyzBrowserStorageService) {
         this.xyzUserListService = xyzUserListService;
         this.xyzFilterByService = xyzFilterByService;
         this.xyzRestRequestService = xyzRestRequestService;
         this.xyzUrlService = xyzUrlService;
+        this.xyzBrowserStorageService = xyzBrowserStorageService;
         this.storageKey = 'filter';
         this.subject = new Subject_1.Subject();
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this.xyzBrowserStorageService.setSession('foo', 'bar');
         this.xyzUrlService.set('fragment', 'foobarbaz').then(function (response) { return console.log('set ', response); });
         this.xyzUrlService.get('fragment').subscribe(function (response) {
             console.log('get ', response);
@@ -91,13 +94,14 @@ var XyzUserListComponent = (function () {
 XyzUserListComponent = __decorate([
     core_1.Component({
         selector: 'xyz-user-list',
-        providers: [filter_by_service_1.XyzFilterByService, user_list_service_1.XyzUserListService, rest_request_service_1.XyzRestRequestService, url_service_1.XyzUrlService],
+        providers: [filter_by_service_1.XyzFilterByService, user_list_service_1.XyzUserListService, rest_request_service_1.XyzRestRequestService, url_service_1.XyzUrlService, browser_storage_service_1.XyzBrowserStorageService],
         templateUrl: 'app/user-list/user-list.component.html'
     }),
     __metadata("design:paramtypes", [user_list_service_1.XyzUserListService,
         filter_by_service_1.XyzFilterByService,
         rest_request_service_1.XyzRestRequestService,
-        url_service_1.XyzUrlService])
+        url_service_1.XyzUrlService,
+        browser_storage_service_1.XyzBrowserStorageService])
 ], XyzUserListComponent);
 exports.XyzUserListComponent = XyzUserListComponent;
 //# sourceMappingURL=user-list.component.js.map
