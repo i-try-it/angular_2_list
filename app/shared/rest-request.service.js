@@ -35,4 +35,4 @@ XyzRestRequestService = __decorate([
         http_1.Jsonp])
 ], XyzRestRequestService);
 exports.XyzRestRequestService = XyzRestRequestService;
-//# sourceMappingURL=rest-request.servise.js.map
+//# sourceMappingURL=rest-request.service.js.map

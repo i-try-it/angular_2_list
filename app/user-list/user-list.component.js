@@ -11,7 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var filter_by_service_1 = require("../shared/filter-by.service");
-var rest_request_servise_1 = require("../shared/rest-request.servise");
+var rest_request_service_1 = require("../shared/rest-request.service");
+var url_service_1 = require("../shared/url.service");
 var user_list_service_1 = require("./user-list.service");
 var Subject_1 = require("rxjs/Subject");
 var Observable_1 = require("rxjs/Observable");
@@ -19,15 +20,20 @@ require("rxjs/add/operator/debounceTime");
 require("rxjs/add/operator/distinctUntilChanged");
 require("rxjs/add/observable/forkJoin");
 var XyzUserListComponent = (function () {
-    function XyzUserListComponent(xyzUserListService, xyzFilterByService, xyzRestRequestService) {
+    function XyzUserListComponent(xyzUserListService, xyzFilterByService, xyzRestRequestService, xyzUrlService) {
         this.xyzUserListService = xyzUserListService;
         this.xyzFilterByService = xyzFilterByService;
         this.xyzRestRequestService = xyzRestRequestService;
+        this.xyzUrlService = xyzUrlService;
         this.storageKey = 'filter';
         this.subject = new Subject_1.Subject();
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this.xyzUrlService.set('fragment', 'foobarbaz').then(function (response) { return console.log('set ', response); });
+        this.xyzUrlService.get('fragment').subscribe(function (response) {
+            console.log('get ', response);
+        });
         // updating the UI only after all our REST requests return data
         Observable_1.Observable.forkJoin(this.xyzRestRequestService.getSettings(), this.xyzRestRequestService.getLocations()).subscribe(function (response) {
             var settings = response[0].json();
@@ -85,12 +91,13 @@ var XyzUserListComponent = (function () {
 XyzUserListComponent = __decorate([
     core_1.Component({
         selector: 'xyz-user-list',
-        providers: [filter_by_service_1.XyzFilterByService, user_list_service_1.XyzUserListService, rest_request_servise_1.XyzRestRequestService],
+        providers: [filter_by_service_1.XyzFilterByService, user_list_service_1.XyzUserListService, rest_request_service_1.XyzRestRequestService, url_service_1.XyzUrlService],
         templateUrl: 'app/user-list/user-list.component.html'
     }),
     __metadata("design:paramtypes", [user_list_service_1.XyzUserListService,
         filter_by_service_1.XyzFilterByService,
-        rest_request_servise_1.XyzRestRequestService])
+        rest_request_service_1.XyzRestRequestService,
+        url_service_1.XyzUrlService])
 ], XyzUserListComponent);
 exports.XyzUserListComponent = XyzUserListComponent;
 //# sourceMappingURL=user-list.component.js.map
