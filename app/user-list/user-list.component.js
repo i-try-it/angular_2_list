@@ -14,8 +14,10 @@ var http_1 = require("@angular/http");
 var filter_by_service_1 = require("../shared/filter-by.service");
 var user_list_service_1 = require("./user-list.service");
 var Subject_1 = require("rxjs/Subject");
+var Observable_1 = require("rxjs/Observable");
 require("rxjs/add/operator/debounceTime");
 require("rxjs/add/operator/distinctUntilChanged");
+require("rxjs/add/observable/forkJoin");
 var XyzUserListComponent = (function () {
     function XyzUserListComponent(http, jsonp, xyzUserListService, xyzFilterByService) {
         this.http = http;
@@ -28,22 +30,13 @@ var XyzUserListComponent = (function () {
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.http.get('http://localhost:5984/user/locations').subscribe(function (response) {
-            var locations = response.json();
+        // updating the UI only after all our REST requests return data
+        Observable_1.Observable.forkJoin(this.jsonp.get(this.settingsUrl + "?callback=JSONP_CALLBACK"), this.http.get('http://localhost:5984/user/locations')).subscribe(function (response) {
+            var settings = response[0].json();
+            var locations = response[1].json();
             _this.regions = (locations.regions && locations.regions.length) ? locations.regions : [];
-        });
-        this.jsonp.get(this.settingsUrl + "?callback=JSONP_CALLBACK").subscribe(function (response) {
-            var settings = response.json();
             _this.revision = settings._rev;
             _this.filter = (settings.filter && settings.filter.length) ? settings.filter : '';
-            //new requests are only sends when typing stops
-            //only last parameters will be used
-            _this.subject
-                .debounceTime(500)
-                .distinctUntilChanged()
-                .subscribe(function (response) {
-                _this.onFilter(response);
-            });
             _this.xyzUserListService.get().then(function (users) {
                 if (_this.filter && _this.filter.length) {
                     _this.users = _this.xyzFilterByService.get({ data: users, filter: _this.filter });
@@ -53,6 +46,12 @@ var XyzUserListComponent = (function () {
                 }
                 return _this.users;
             });
+        });
+        this.subject
+            .debounceTime(500)
+            .distinctUntilChanged()
+            .subscribe(function (response) {
+            _this.onFilter(response);
         });
     };
     XyzUserListComponent.prototype.onFilter = function (filter) {
