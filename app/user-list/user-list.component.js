@@ -10,8 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
-var http_1 = require("@angular/http");
 var filter_by_service_1 = require("../shared/filter-by.service");
+var rest_request_servise_1 = require("../shared/rest-request.servise");
 var user_list_service_1 = require("./user-list.service");
 var Subject_1 = require("rxjs/Subject");
 var Observable_1 = require("rxjs/Observable");
@@ -19,19 +19,17 @@ require("rxjs/add/operator/debounceTime");
 require("rxjs/add/operator/distinctUntilChanged");
 require("rxjs/add/observable/forkJoin");
 var XyzUserListComponent = (function () {
-    function XyzUserListComponent(http, jsonp, xyzUserListService, xyzFilterByService) {
-        this.http = http;
-        this.jsonp = jsonp;
+    function XyzUserListComponent(xyzUserListService, xyzFilterByService, xyzRestRequestService) {
         this.xyzUserListService = xyzUserListService;
         this.xyzFilterByService = xyzFilterByService;
+        this.xyzRestRequestService = xyzRestRequestService;
         this.storageKey = 'filter';
-        this.settingsUrl = 'http://localhost:5984/user/settings';
         this.subject = new Subject_1.Subject();
     }
     XyzUserListComponent.prototype.ngOnInit = function () {
         var _this = this;
         // updating the UI only after all our REST requests return data
-        Observable_1.Observable.forkJoin(this.jsonp.get(this.settingsUrl + "?callback=JSONP_CALLBACK"), this.http.get('http://localhost:5984/user/locations')).subscribe(function (response) {
+        Observable_1.Observable.forkJoin(this.xyzRestRequestService.getSettings(), this.xyzRestRequestService.getLocations()).subscribe(function (response) {
             var settings = response[0].json();
             var locations = response[1].json();
             _this.regions = (locations.regions && locations.regions.length) ? locations.regions : [];
@@ -59,7 +57,7 @@ var XyzUserListComponent = (function () {
         this.filter = filter;
         var filterParams = {};
         filterParams[this.storageKey] = this.filter;
-        this.http.put(this.settingsUrl, {
+        this.xyzRestRequestService.setSettings({
             _rev: this.revision,
             filter: this.filter
         }).subscribe(function (response) {
@@ -74,7 +72,7 @@ var XyzUserListComponent = (function () {
         var _this = this;
         this.xyzUserListService.get().then(function (users) { return _this.users = users; });
         this.filter = '';
-        this.http.put(this.settingsUrl, {
+        this.xyzRestRequestService.setSettings({
             _rev: this.revision,
             filter: ''
         }).subscribe(function (response) {
@@ -87,13 +85,12 @@ var XyzUserListComponent = (function () {
 XyzUserListComponent = __decorate([
     core_1.Component({
         selector: 'xyz-user-list',
-        providers: [filter_by_service_1.XyzFilterByService, user_list_service_1.XyzUserListService],
+        providers: [filter_by_service_1.XyzFilterByService, user_list_service_1.XyzUserListService, rest_request_servise_1.XyzRestRequestService],
         templateUrl: 'app/user-list/user-list.component.html'
     }),
-    __metadata("design:paramtypes", [http_1.Http,
-        http_1.Jsonp,
-        user_list_service_1.XyzUserListService,
-        filter_by_service_1.XyzFilterByService])
+    __metadata("design:paramtypes", [user_list_service_1.XyzUserListService,
+        filter_by_service_1.XyzFilterByService,
+        rest_request_servise_1.XyzRestRequestService])
 ], XyzUserListComponent);
 exports.XyzUserListComponent = XyzUserListComponent;
 //# sourceMappingURL=user-list.component.js.map

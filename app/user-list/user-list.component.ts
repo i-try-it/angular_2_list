@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { OnInit } from '@angular/core';
-import { Http, Jsonp } from '@angular/http';
-
 
 import { XyzFilterByService } from '../shared/filter-by.service';
+import { XyzRestRequestService } from '../shared/rest-request.servise';
 import { XyzUserListService } from './user-list.service';
 
 import { Subject } from 'rxjs/Subject';
@@ -14,7 +13,7 @@ import 'rxjs/add/observable/forkJoin';
 
 @Component({
   selector: 'xyz-user-list',
-  providers: [XyzFilterByService, XyzUserListService],
+  providers: [XyzFilterByService, XyzUserListService, XyzRestRequestService],
   templateUrl: 'app/user-list/user-list.component.html'
 })
 export class XyzUserListComponent implements OnInit {
@@ -28,21 +27,19 @@ export class XyzUserListComponent implements OnInit {
   regions: string[];
 
   constructor(
-    private http: Http,
-    private jsonp: Jsonp,
     private xyzUserListService: XyzUserListService,
-    private xyzFilterByService: XyzFilterByService
+    private xyzFilterByService: XyzFilterByService,
+    private xyzRestRequestService: XyzRestRequestService
   ) {
     this.storageKey = 'filter';
-    this.settingsUrl = 'http://localhost:5984/user/settings';
     this.subject = new Subject();
   }
 
   ngOnInit() { // will fire once on page load
     // updating the UI only after all our REST requests return data
     Observable.forkJoin(
-      this.jsonp.get(`${this.settingsUrl}?callback=JSONP_CALLBACK`),
-      this.http.get('http://localhost:5984/user/locations')
+      this.xyzRestRequestService.getSettings(),
+      this.xyzRestRequestService.getLocations()
     ).subscribe(response => {
       let settings = response[0].json();
       let locations = response[1].json();
@@ -76,7 +73,7 @@ export class XyzUserListComponent implements OnInit {
     this.filter = filter;
     let filterParams = {};
     filterParams[this.storageKey] = this.filter;
-    this.http.put(this.settingsUrl, {
+    this.xyzRestRequestService.setSettings({
       _rev: this.revision,
       filter: this.filter
     }).subscribe(response => {
@@ -91,7 +88,7 @@ export class XyzUserListComponent implements OnInit {
   onClear() {
     this.xyzUserListService.get().then(users => this.users = users);
     this.filter = '';
-    this.http.put(this.settingsUrl, {
+    this.xyzRestRequestService.setSettings({
       _rev: this.revision,
       filter: ''
     }).subscribe(response => {
